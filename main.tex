@@ -1,76 +1,88 @@
 \documentclass[11pt,letterpaper]{article}
-
-% Page layout: 1-inch margins on all sides (requirement: at least 1 inch)
-\usepackage[letterpaper,margin=1in]{geometry}
-
+\usepackage[margin=1in]{geometry}
+\usepackage{mathptmx}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{graphicx}  % figures
-\usepackage{booktabs}  % clean tables
-\usepackage{caption}   % caption formatting
-\usepackage{enumitem}  % compact lists
+\usepackage[table]{xcolor}
+\usepackage{booktabs,array,amsmath}
 \usepackage[numbers,sort&compress]{natbib}
-\usepackage[hidelinks]{hyperref}
-
-% Tighten whitespace so more content fits in the 2-page limit,
-% without shrinking the 11pt body font.
-\setlist{nosep,leftmargin=*}
-\captionsetup{font=small,skip=4pt}
-\setlength{\parskip}{0pt}
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\usepackage{enumitem}
 \usepackage{titlesec}
-\titlespacing*{\section}{0pt}{6pt plus 2pt minus 2pt}{3pt plus 1pt minus 1pt}
-\titlespacing*{\subsection}{0pt}{4pt plus 2pt minus 2pt}{2pt plus 1pt minus 1pt}
-
+\usepackage[font=footnotesize,skip=2pt]{caption}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\titleformat{\section}{\normalsize\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{3pt}{0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.5pt}
+\setlist{nosep,leftmargin=12pt}
+\setlength{\bibsep}{1pt}
+\pagestyle{plain}
+\newcommand{\D}{\cellcolor{gray!55}}
+\newcommand{\G}{\cellcolor{blue!45}}
 \begin{document}
 
-% Compact title block (replaces \maketitle to save vertical space)
 \begin{center}
-  {\Large\bfseries CSE 6242 Project Proposal: <Project Title>}\\[4pt]
-  Team <\#>: nxiong30, <member 2>, <member 3>, <member 4>
+{\large\bfseries Calibrated Stars: Reviewer-Adjusted, Uncertainty-Aware Restaurant Ratings on Yelp}\\[2pt]
+Team 26: Weiran Cai, Zhen Yu, Yee Ching Wong, Nan Xiong
 \end{center}
+\vspace{-6pt}
 
-% Sections follow the Heilmeier Catechism. The proposal must be at most
-% 2 letter-size pages EXCLUDING references; everything below counts.
+\section{Q1. What are we trying to do?}
+Restaurant ratings are simple averages of stars, so 6 reviews at 4.8 stars can beat 800 reviews at 4.6, and a place visited mostly by generous reviewers looks better than it is. We will build an interactive tool that corrects for both, shows how sure we are about each rating and how the ``top'' list changes, and test whether corrected ratings better predict what future customers say.
 
-\section{Introduction and Problem Definition}
-% What are you trying to do? Articulate your objectives using absolutely
-% no jargon. State the problem formally/precisely.
+\section{Q2. How is it done today? Limits of current practice (literature survey)}
+\textit{Rating aggregation on Yelp.} Dai et al.~\cite{dai2018} model Yelp ratings as noisy signals and derive aggregation weights reflecting reviewer stringency, accuracy, and quality drift; optimal ratings differ notably from simple averages. This is the closest prior work and motivates our goal, but it relies on a complex structural model estimated in-sample, with no uncertainty display or forward validation; we use a simpler, scalable model and test it on future reviews. Luca~\cite{luca2016} shows via the rounding of displayed stars that one extra star raises independent restaurants' revenue by 5--9\%, establishing the stakes; it treats the displayed average as given rather than asking whether it is accurate. Luca and Zervas~\cite{luca2016fake} find self-promoting fake reviews rise when reputation is weak, and attacks when competition is intense; this warns that some ``reviewer tendency'' reflects strategic behavior, but the paper offers no correction for honest-but-lenient reviewers.
 
-\section{Literature Survey}
-% How is it done today; what are the limits of current practice?
-% Briefly review the key ideas of each reference so the document is
-% self-contained (don't just cite, e.g. ``we will use [Smith86]'').
-% Example citation: \citep{example2024}.
+\textit{Modeling rater bias.} Dawid and Skene~\cite{dawid1979} estimate each rater's error pattern and latent true labels jointly with EM, the founding idea of our joint estimation; it targets categorical labels with dense rater overlap, not sparse one-off reviewers. Koren~\cite{koren2008} adds regularized user and item bias terms ($\mu+b_u+b_i$) to Netflix collaborative filtering, the penalized analogue of our random-effect point estimates; its biases serve prediction accuracy only, without uncertainty or interpretation as public ratings. Baayen et al.~\cite{baayen2008} show crossed random effects for subjects and items replace separate by-subject and by-item analyses; we adopt this template, but their examples are small experiments whereas ours are millions of unbalanced reviews.
 
-\section{Proposed Method}
-\subsection{Intuition}
-% What is new in your approach and why do you think it will be successful?
+\textit{Shrinkage and ranking under uncertainty.} Efron and Morris~\cite{efron1975} show shrunken early-season batting averages predict the rest of the season better than raw averages; this is exactly our evaluation logic, though with one grouping factor and equal sample sizes. Gelman and Hill~\cite{gelman2007} explain partial pooling and non-nested multilevel models, guiding our reference-reviewer predictions, but offer no guidance on ranking. Henderson and Newton~\cite{henderson2016} rank units by the posterior probability of truly belonging to the top fraction (r-values); we will compare it with our simpler uncertainty penalty, since r-values are costly to recompute interactively. Wang et al.~\cite{wang2010} infer aspect ratings and reviewer aspect weights from review text, showing that stars mix different priorities; it needs heavy NLP and ignores leniency and uncertainty, so we use stars only for transparency.
 
-\subsection{Description of Approach}
-% Algorithms, data, and the interactive visualization you will build.
-% Describe clearly the alternatives you will examine.
+\textit{Visualizing uncertainty and rankings.} Correll and Gleicher~\cite{correll2014} find bar-plus-error-bar charts bias judgments and that gradient or violin encodings support better inference; we will use point-and-interval and gradient marks, though their single-comparison tasks do not test linked ranking views. Kay et al.~\cite{kay2016} show quantile dotplots sharpen lay users' probability estimates, a candidate encoding for one restaurant's rating; it covers one prediction, not hundreds ranked. LineUp~\cite{gratzl2013} supports interactive weighted rankings with slope graphs of rank change, our model for the ranking simulator; it treats scores as exact, which we improve by ranking on uncertain estimates. Becker and Cleveland~\cite{becker1987} introduced brushing linked scatterplots, the basis of our coordinated views, but with static data rather than model-driven estimates.
 
-\section{Impact}
-% Who cares? If you are successful, what difference will it make?
+\textbf{Limits.} Platforms show raw means; existing fixes handle sample size \emph{or} rater bias, rarely show uncertainty, are seldom tested on future customers, and never show users why a rating moved.
 
-\section{Risks and Payoffs}
-% What are the risks and the payoffs?
+\section{Q3. What is new, and why will it succeed? (Expected innovations)}
+\textbf{Algorithm.} (1) A crossed mixed-effects model on the Yelp Open Dataset~\cite{yelp}, $y_{ij}=\mu+\mathbf{x}_j^\top\beta+b_j+u_i+\varepsilon_{ij}$, with restaurant effect $b_j$, reviewer tendency $u_i$, and city, cuisine, and period terms $\mathbf{x}_j$, fitted jointly with lme4~\cite{bates2015}; the adjusted rating is the expected score from a reference reviewer ($u=0$) with a 95\% interval. (2) An uncertainty-penalized ranking whose penalty is tuned on future data and compared with r-values~\cite{henderson2016}. (3) A rolling-cutoff backtest that isolates the value of reviewer adjustment over business-only shrinkage. \textbf{Visualization.} (1) Linked D3~\cite{bostock2011} views connecting raw vs.\ adjusted scatterplot, peer interval plot, map, and ranking; (2) a per-restaurant waterfall that splits the change from raw to adjusted into shrinkage and reviewer adjustment; (3) a live ranking simulator showing the trade-off between evidence and discovery of new restaurants. \textbf{Why it will succeed:} the data is large and public, the model is standard and scales on a laptop, and if reviewer effects are weak, shrinkage plus uncertainty ranking is still a complete system.
 
-\section{Cost}
-% How much will it cost?
+\section{Q4. Who cares?}
+Diners; restaurant owners, whose revenue moves with stars~\cite{luca2016}, especially new places; platforms needing trusted ratings that do not bury newcomers; and multi-rater settings such as peer grading.
 
-\section{Evaluation and Plan of Activities}
-% How long will it take? What are the mid-term and final ``exams'' to
-% check for success? How will progress be measured? Include a timeline
-% (e.g., a Gantt chart or table) and who does what.
+\section{Q5. Impact, and how we measure it}
+No ``true quality'' label exists, so we measure usefulness on future reviews: at rolling cutoffs within chronological train/validation/test periods, each method sees only past reviews and is scored on the next 3 or 6 months. Baselines: raw mean, mean with $\geq$20 reviews, Bayesian average with city/cuisine prior, recent-window mean, and business-only shrinkage. Metrics: MAE/RMSE on future stars and future restaurant averages, calibration, Spearman and top-$K$ overlap, interval coverage in simulations with known parameters, ranking stability, and discovery coverage of low-volume restaurants, all with paired restaurant-level bootstrap. A short usability check with classmates tests the waterfall and simulator.
 
-\noindent All team members have contributed a similar amount of effort.
+\section{Q6. Risks and payoffs}
+\textbf{Risks:} sparse reviewer histories (profile overlap early, pick dense cities); slow bootstrap (use lme4 conditional variances, bootstrap a subsample); out-of-range predictions (check residuals, ordinal model as extension); D3 linking delays (ship scatterplot and simulator first). \textbf{Payoffs:} a validated, explainable rating method and tool; even a null result tells platforms whether reviewer adjustment is worth its complexity.
 
-% References do NOT count toward the page limit. Starting them on a new
-% page makes it easy to confirm the body fits within 2 pages.
+\section{Q7. Cost \quad Q8. Time \quad Q9. Midterm and final exams}
+\textbf{Cost:} \$0; free dataset, open-source tools (DuckDB, Python, R, D3), GitHub Pages hosting, laptops plus free GT computing if needed. \textbf{Time:} 11 weeks (Table~\ref{tab:plan}). \textbf{Midterm (progress report):} data pipeline and profile, model fitted on one city, all baselines at one cutoff, dashboard prototype on real output. \textbf{Final:} full test-period evaluation with bootstrap comparisons and sensitivity analysis, a clear positive or null answer on reviewer adjustment, and the complete linked dashboard online. Progress is tracked weekly through GitHub issues against Table~\ref{tab:plan}.
+
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{0.95}
+\begin{tabular}{@{}p{7.3cm}l*{11}{>{\centering\arraybackslash}p{0.42cm}}@{}}
+\toprule
+Activity & Lead & \scriptsize W1 & \scriptsize W2 & \scriptsize W3 & \scriptsize W4 & \scriptsize W5 & \scriptsize W6 & \scriptsize W7 & \scriptsize W8 & \scriptsize W9 & \scriptsize W10 & \scriptsize W11\\
+\midrule
+Topic selection, dataset comparison (done) & All & \D &&&&&&&&&&\\
+Literature survey, proposal & All & \D & \G &&&&&&&&&\\
+Download data; JSON $\rightarrow$ Parquet/DuckDB pipeline & M1 && \G & \G &&&&&&&&\\
+Profiling: cities, dates, reviewer overlap & M1 &&& \G & \G &&&&&&&\\
+Dashboard skeleton (scatterplot, simulator, mock data) & M4 &&& \G & \G & \G &&&&&&\\
+Mixed-effects model on one city; variance components & M2 &&&& \G & \G &&&&&&\\
+Baselines (raw, $\geq$20, Bayesian, recent, business-only) & M3 &&&& \G & \G &&&&&&\\
+Intervals, conservative score, JSON export & M2 &&&&&& \G & \G &&&&\\
+Rolling-cutoff backtests, validation tuning & M3 &&&&&& \G & \G &&&&\\
+Progress report & All &&&&&&& \G &&&&\\
+Interval plot, waterfall, map, cross-view linking & M4, M1 &&&&&&& \G & \G & \G & \G &\\
+Test evaluation, bootstrap, sensitivity analysis & M3, M2 &&&&&&&& \G & \G &&\\
+Usability check, poster, final report & All &&&&&&&&&& \G & \G\\
+\bottomrule
+\end{tabular}
+\captionof{table}{Plan of activities (W1 = week of Sep 28, 2026; W11 = week of Dec 7; gray = done, blue = planned).}\label{tab:plan}
+\end{center}\vspace{-10pt}
+\textbf{Effort distribution:} all team members have contributed a similar amount of effort so far, and the planned work above is divided evenly.
+
 \clearpage
-\bibliographystyle{plainnat}
+\bibliographystyle{unsrtnat}
 \bibliography{references}
-
 \end{document}
