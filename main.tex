@@ -1,14 +1,76 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+\documentclass[11pt,letterpaper]{article}
 
-\title{CSE 6242 Project Proposal}
-\author{nxiong30 }
-\date{October 2026}
+% Page layout: 1-inch margins on all sides (requirement: at least 1 inch)
+\usepackage[letterpaper,margin=1in]{geometry}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}  % figures
+\usepackage{booktabs}  % clean tables
+\usepackage{caption}   % caption formatting
+\usepackage{enumitem}  % compact lists
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% Tighten whitespace so more content fits in the 2-page limit,
+% without shrinking the 11pt body font.
+\setlist{nosep,leftmargin=*}
+\captionsetup{font=small,skip=4pt}
+\setlength{\parskip}{0pt}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{6pt plus 2pt minus 2pt}{3pt plus 1pt minus 1pt}
+\titlespacing*{\subsection}{0pt}{4pt plus 2pt minus 2pt}{2pt plus 1pt minus 1pt}
 
 \begin{document}
 
-\maketitle
+% Compact title block (replaces \maketitle to save vertical space)
+\begin{center}
+  {\Large\bfseries CSE 6242 Project Proposal: <Project Title>}\\[4pt]
+  Team <\#>: nxiong30, <member 2>, <member 3>, <member 4>
+\end{center}
 
-\section{Introduction}
+% Sections follow the Heilmeier Catechism. The proposal must be at most
+% 2 letter-size pages EXCLUDING references; everything below counts.
+
+\section{Introduction and Problem Definition}
+% What are you trying to do? Articulate your objectives using absolutely
+% no jargon. State the problem formally/precisely.
+
+\section{Literature Survey}
+% How is it done today; what are the limits of current practice?
+% Briefly review the key ideas of each reference so the document is
+% self-contained (don't just cite, e.g. ``we will use [Smith86]'').
+% Example citation: \citep{example2024}.
+
+\section{Proposed Method}
+\subsection{Intuition}
+% What is new in your approach and why do you think it will be successful?
+
+\subsection{Description of Approach}
+% Algorithms, data, and the interactive visualization you will build.
+% Describe clearly the alternatives you will examine.
+
+\section{Impact}
+% Who cares? If you are successful, what difference will it make?
+
+\section{Risks and Payoffs}
+% What are the risks and the payoffs?
+
+\section{Cost}
+% How much will it cost?
+
+\section{Evaluation and Plan of Activities}
+% How long will it take? What are the mid-term and final ``exams'' to
+% check for success? How will progress be measured? Include a timeline
+% (e.g., a Gantt chart or table) and who does what.
+
+\noindent All team members have contributed a similar amount of effort.
+
+% References do NOT count toward the page limit. Starting them on a new
+% page makes it easy to confirm the body fits within 2 pages.
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{references}
 
 \end{document}
